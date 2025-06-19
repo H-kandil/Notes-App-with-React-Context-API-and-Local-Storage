@@ -1,5 +1,16 @@
-const App = () => {
-  return <h1 className='text-3xl font-bold underline'>React + TailwindCSS</h1>;
-};
- 
+// src/App.jsx
+
+import { Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+
+function App() {
+    return (
+        <div className="min-h-screen bg-gray-100">
+            <Routes>
+                <Route path="/" element={<Home />} />
+            </Routes>
+        </div>
+    );
+}
+
 export default App;
