@@ -1,5 +1,3 @@
-// src/context/NotesContext.jsx
-
 import { createContext, useEffect, useState } from "react";
 
 export const NotesContext = createContext();<div className=""></div>

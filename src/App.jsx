@@ -1,15 +1,15 @@
-// src/App.jsx
-
-import { Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
+import NewNote from "./pages/NewNote";
 
 function App() {
     return (
-        <div className="min-h-screen bg-gray-100">
+        <BrowserRouter>
             <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/new" element={<NewNote />} />
             </Routes>
-        </div>
+        </BrowserRouter>
     );
 }
 
