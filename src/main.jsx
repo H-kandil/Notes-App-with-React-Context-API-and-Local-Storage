@@ -1,14 +1,16 @@
-// src/main.jsx
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
+import { BrowserRouter } from "react-router-dom";
+import { NotesProvider } from "./context/NotesContext"; // تأكد من المسار
 import "./index.css";
-import { NotesProvider } from "./context/NotesContext";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
     <React.StrictMode>
-        <NotesProvider>
-            <App />
-        </NotesProvider>
+        <BrowserRouter>
+            <NotesProvider>
+                <App />
+            </NotesProvider>
+        </BrowserRouter>
     </React.StrictMode>
 );

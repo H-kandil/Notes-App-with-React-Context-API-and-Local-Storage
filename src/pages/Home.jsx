@@ -1,44 +1,50 @@
-// src/pages/Home.jsx
-
-import { useContext } from "react";
-import { NotesContext } from "../context/NotesContext";
+import { useNotes } from "../context/NotesContext";
 import { Link } from "react-router-dom";
 
 function Home() {
-    const { notes } = useContext(NotesContext);
+    const { notes } = useNotes();
 
     return (
-        <div className="p-4">
-            <div className="flex justify-between items-center mb-4">
-                <h1 className="text-2xl font-bold">My Notes</h1>
-                <Link
-                    to="/new"
-                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                >
-                    + Add Note
-                </Link>
-            </div>
+        <div className="min-h-screen bg-orange-50 p-6">
+            <div className="max-w-6xl mx-auto">
+                <div className="flex justify-between items-center mb-6">
+                    <h1 className="text-7xl font-bold text-gray-800">
+                        📝 My Notes
+                    </h1>
+                    <Link
+                        to="/new"
+                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300"
+                    >
+                        + Add Note
+                    </Link>
+                </div>
 
-            {notes.length === 0 ? (
-                <p className="text-gray-500">No notes yet.</p>
-            ) : (
-                <ul className="space-y-4">
-                    {notes.map((note) => (
-                        <li
-                            key={note.id}
-                            className="border p-3 rounded bg-white shadow"
-                        >
-                            <h2 className="font-semibold text-lg">
-                                {note.title}
-                            </h2>
-                            <p className="text-sm text-gray-600">
-                                {note.category}
-                            </p>
-                            <p>{note.content}</p>
-                        </li>
-                    ))}
-                </ul>
-            )}
+                {notes.length === 0 ? (
+                    <p className="text-gray-500 text-center">No notes yet</p>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                        {notes.map((note) => (
+                            <div
+                                key={note.id}
+                                className="bg-white rounded-2xl shadow-lg p-5 hover:shadow-xl transition duration-300"
+                            >
+                                <h2 className="text-xl font-semibold text-gray-700 mb-2">
+                                    {note.title}
+                                </h2>
+                                <p className="text-gray-600 mb-3">
+                                    {note.content}
+                                </p>
+                                <div className="flex justify-between text-sm text-gray-500">
+                                    <span className="font-medium">
+                                        📂 {note.category}
+                                    </span>
+                                    <span>{note.date}</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
