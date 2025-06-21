@@ -2,7 +2,13 @@ import { useNotes } from "../context/NotesContext";
 import { Link } from "react-router-dom";
 
 function Home() {
-    const { notes } = useNotes();
+    const { notes, deleteNote } = useNotes();
+
+    const handleDelete = (id) => {
+        if (confirm("Are you sure you want to delete this note?")) {
+            deleteNote(id);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-orange-50 p-6">
@@ -36,9 +42,26 @@ function Home() {
                                 </p>
                                 <div className="flex justify-between text-sm text-gray-500">
                                     <span className="font-medium">
-                                        📂 {note.category}
+                                        {note.category}
                                     </span>
                                     <span>{note.date}</span>
+                                </div>
+                                <div className="flex justify-end space-x-2 mt-2">
+                                    {/* زر التعديل */}
+                                    <Link
+                                        to={`/edit/${note.id}`}
+                                        className="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded"
+                                    >
+                                        Edit
+                                    </Link>
+
+                                    {/* زر الحذف */}
+                                    <button
+                                        onClick={() => handleDelete(note.id)}
+                                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                                    >
+                                        Delete
+                                    </button>
                                 </div>
                             </div>
                         ))}
