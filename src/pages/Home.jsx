@@ -3,12 +3,11 @@ import { Link } from "react-router-dom";
 
 function Home() {
     const { notes, deleteNote } = useNotes();
-
-    const handleDelete = (id) => {
-        if (confirm("Are you sure you want to delete this note?")) {
-            deleteNote(id);
-        }
-    };
+const handleDelete = (id) => {
+    if (confirm("Are you sure you want to delete this note?")) {
+        deleteNote(id);
+    }
+};
 
     return (
         <div className="min-h-screen bg-orange-50 p-6">
@@ -57,7 +56,7 @@ function Home() {
 
                                     {/* زر الحذف */}
                                     <button
-                                        onClick={() => handleDelete(note.id)}
+                                        onClick={() => deleteNote (note.id)}
                                         className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
                                     >
                                         Delete
