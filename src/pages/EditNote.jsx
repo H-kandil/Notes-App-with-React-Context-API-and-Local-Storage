@@ -1,34 +1,27 @@
 // Import necessary React functions and context
-// استيراد الأدوات المطلوبة من React والمكتبات الأخرى
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useNotes } from "../context/NotesContext";
 
 function EditNote() {
     // Get note ID from the URL parameters
-    // جلب معرف النوتة من عنوان الرابط (URL)
     const { id } = useParams();
 
     // Hook for navigation
-    // هوك التنقل بين الصفحات
     const navigate = useNavigate();
 
     // Access notes and updateNote function from context
-    // الوصول إلى الملاحظات ودالة التحديث من السياق
     const { notes, updateNote } = useNotes();
 
     // Find the note to edit based on ID
-    // البحث عن النوتة المراد تعديلها باستخدام الـ ID
     const noteToEdit = notes.find((note) => note.id === Number(id));
 
     // Local state for form inputs
-    // إنشاء حالات محلية لحفظ البيانات المعدلة
-    const [title, setTitle] = useState(""); // عنوان النوتة
-    const [content, setContent] = useState(""); // محتوى النوتة
-    const [category, setCategory] = useState(""); // تصنيف النوتة
+    const [title, setTitle] = useState("");
+    const [content, setContent] = useState("");
+    const [category, setCategory] = useState("");
 
     // Set the current values in form fields when component mounts
-    // تعبئة النموذج بقيم النوتة الحالية عند تحميل الصفحة
     useEffect(() => {
         if (noteToEdit) {
             setTitle(noteToEdit.title);
@@ -38,80 +31,70 @@ function EditNote() {
     }, [noteToEdit]);
 
     // Handle form submission
-    // دالة تنفيذ عند الضغط على زر "تحديث النوتة"
     const handleSubmit = (e) => {
-        e.preventDefault(); // Prevent page reload
-        // منع تحديث الصفحة
+        e.preventDefault();
 
         // Validate fields
-        // التحقق من تعبئة كل الحقول
         if (!title || !content || !category) {
-            alert("Please fill all fields"); // Show alert if any field is empty
+            alert("Please fill all fields");
             return;
         }
 
         // Create updated note object
-        // إنشاء كائن جديد يمثل النوتة المعدلة
         const updatedNote = {
-            ...noteToEdit, // الاحتفاظ بباقي القيم كما هي (مثل id)
-            title, // العنوان الجديد
-            content, // المحتوى الجديد
-            category, // التصنيف الجديد
-            date: new Date().toLocaleString(), // تحديث تاريخ التعديل
+            ...noteToEdit,
+            title,
+            content,
+            category,
+            date: new Date().toLocaleString(),
         };
 
-        updateNote(updatedNote); // Update note in context
-        // تحديث النوتة في السياق العام
-
-        navigate("/"); // Redirect to homepage
-        // الرجوع للصفحة الرئيسية
+        updateNote(updatedNote);
+        navigate("/");
     };
 
     // If note not found, show error message
-    // في حال لم يتم العثور على النوتة
     if (!noteToEdit) {
         return <p className="text-center mt-10 text-white">Note not found</p>;
     }
 
     return (
-        // Background with gradient (same as homepage)
-        // خلفية ملونة بتدرج مثل الصفحة الرئيسية
-        <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center px-4">
-            {/* Note container */}
-            {/* حاوية المحتوى البيضاء */}
-            <div className="bg-white bg-opacity-90 p-6 rounded-2xl shadow-lg w-full max-w-xl">
-                {/* Page title */}
-                {/* عنوان الصفحة */}
+        // Main container with animated gradient background
+        <div
+            className="min-h-screen p-8 flex items-center justify-center"
+            style={{
+                backgroundImage:
+                    "linear-gradient(135deg, rgb(255,25,77), rgb(112,42,140), rgb(255,115,38), rgb(255,204,13))",
+                backgroundSize: "400% 400%",
+                animation: "gradientMove 15s ease infinite",
+            }}
+        >
+            {/* Note edit form container */}
+            <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-xl">
                 <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
                     Edit Note
-                    {/* تعديل نوتة */}
                 </h2>
 
-                {/* Form for editing the note */}
-                {/* نموذج تعديل النوتة */}
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {/* Title input */}
-                    {/* حقل تعديل العنوان */}
                     <input
                         type="text"
-                        className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400"
+                        className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                     />
 
                     {/* Content textarea */}
-                    {/* تعديل محتوى النوتة */}
                     <textarea
-                        className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400"
+                        className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
                         rows={5}
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
                     />
 
                     {/* Category select */}
-                    {/* تعديل التصنيف */}
                     <select
-                        className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400"
+                        className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
                     >
@@ -122,20 +105,27 @@ function EditNote() {
                     </select>
 
                     {/* Update button */}
-                    {/* زر تحديث النوتة */}
                     <button
                         type="submit"
-                        className="w-full bg-gradient-to-r from-green-500 to-teal-500 text-white py-3 rounded-lg font-semibold shadow-md hover:opacity-90 transition"
+                        className="w-full bg-pink-600 hover:bg-pink-700 text-white py-3 rounded-lg font-semibold shadow-md transition"
                     >
                         Update Note
-                        {/* تحديث النوتة */}
                     </button>
                 </form>
             </div>
+
+            {/* Animated gradient background CSS */}
+            <style>
+                {`
+                @keyframes gradientMove {
+                    0% { background-position: 0% 50%; }
+                    50% { background-position: 100% 50%; }
+                    100% { background-position: 0% 50%; }
+                }
+                `}
+            </style>
         </div>
     );
 }
 
-// Export the component
-// تصدير الكومبوننت لاستخدامه في التطبيق
 export default EditNote;

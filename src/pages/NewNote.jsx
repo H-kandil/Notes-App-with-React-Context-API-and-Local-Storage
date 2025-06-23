@@ -1,101 +1,79 @@
-// Import necessary React hooks and functions
-// استيراد الأدوات المطلوبة من React والمكتبات الأخرى
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useNotes } from "../context/NotesContext";
 
 function NewNote() {
-    // Local state for form inputs: title, content, and category
-    // إنشاء حالات (states) محلية لحفظ قيم المدخلات
-    const [title, setTitle] = useState(""); // عنوان النوتة
-    const [content, setContent] = useState(""); // محتوى النوتة
-    const [category, setCategory] = useState(""); // تصنيف النوتة
-
-    // Access addNote function from global context
-    // استدعاء دالة إضافة النوتة من السياق العام (context)
-    const { addNote } = useNotes();
-
-    // Hook for navigating between routes
-    // استخدام useNavigate للتنقل بين الصفحات
+    // Hook for navigation
     const navigate = useNavigate();
 
-    // Function triggered when form is submitted
-    // دالة تُنفذ عند إرسال الفورم (الضغط على زر الحفظ)
-    const handleSubmit = (e) => {
-        e.preventDefault(); // Prevent page reload
-        // منع تحديث الصفحة بشكل افتراضي
+    // Access addNote function from context
+    const { addNote } = useNotes();
 
-        // Check if any field is empty
-        // التحقق من أن جميع الحقول مملوءة
+    // Local state for form inputs
+    const [title, setTitle] = useState("");
+    const [content, setContent] = useState("");
+    const [category, setCategory] = useState("");
+
+    // Handle form submission
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        // Validate form fields
         if (!title || !content || !category) {
-            alert("Please fill in all fields"); // Show alert if any field is empty
-            // عرض تنبيه للمستخدم إذا كان هناك حقل فارغ
+            alert("Please fill all fields");
             return;
         }
 
-        // Create new note object with user input
-        // إنشاء كائن يمثل النوتة الجديدة بالقيم المدخلة
+        // Create new note object
         const newNote = {
-            id: Date.now(), // Unique ID using timestamp
-            title, // العنوان
-            content, // المحتوى
-            category, // التصنيف
-            date: new Date().toLocaleString(), // تاريخ الإنشاء بشكل مقروء
+            id: Date.now(),
+            title,
+            content,
+            category,
+            date: new Date().toLocaleString(),
         };
 
-        addNote(newNote); // Add the new note to the context
-        // إضافة النوتة الجديدة للسياق (global state)
-
-        navigate("/"); // Navigate back to the home page
-        // العودة إلى الصفحة الرئيسية بعد الحفظ
+        addNote(newNote); // Add note to context
+        navigate("/"); // Redirect to homepage
     };
 
     return (
-        // Background with gradient (same as homepage)
-        // خلفية ملونة بتدرج مشابه للصفحة الرئيسية
-        <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center px-4">
-            {/* Note container */}
-            {/* حاوية النوتة (كارت أبيض وسط الصفحة) */}
-            <div className="bg-white bg-opacity-90 p-6 rounded-2xl shadow-lg w-full max-w-xl">
-                {/* Page heading */}
-                {/* عنوان الصفحة */}
+        <div
+            className="min-h-screen p-8 flex items-center justify-center"
+            style={{
+                backgroundImage:
+                    "linear-gradient(135deg, rgb(255,25,77), rgb(112,42,140), rgb(255,115,38), rgb(255,204,13))",
+                backgroundSize: "400% 400%",
+                animation: "gradientMove 15s ease infinite",
+            }}
+        >
+            {/* Note creation form container */}
+            <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-xl">
                 <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
-                    Add a New Note
-                    {/* إضافة نوتة جديدة */}
+                    Add New Note
                 </h2>
 
-                {/* Form for adding a new note */}
-                {/* نموذج الإدخال لإضافة نوتة جديدة */}
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    {/* Input field for note title */}
-                    {/* حقل إدخال عنوان النوتة */}
                     <input
                         type="text"
                         placeholder="Title"
-                        className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400"
+                        className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
                         value={title}
-                        onChange={(e) => setTitle(e.target.value)} // Update title state
-                        // تحديث قيمة العنوان عند الكتابة
+                        onChange={(e) => setTitle(e.target.value)}
                     />
 
-                    {/* Textarea for note content */}
-                    {/* مربع نص لإدخال محتوى النوتة */}
                     <textarea
                         placeholder="Content"
-                        className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400"
+                        className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
                         rows={5}
                         value={content}
-                        onChange={(e) => setContent(e.target.value)} // Update content state
-                        // تحديث قيمة المحتوى
-                    ></textarea>
+                        onChange={(e) => setContent(e.target.value)}
+                    />
 
-                    {/* Dropdown for selecting note category */}
-                    {/* قائمة منسدلة لاختيار التصنيف */}
                     <select
-                        className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400"
+                        className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
                         value={category}
-                        onChange={(e) => setCategory(e.target.value)} // Update category state
-                        // تحديث التصنيف
+                        onChange={(e) => setCategory(e.target.value)}
                     >
                         <option value="">Select a category</option>
                         <option value="Work">Work</option>
@@ -103,21 +81,27 @@ function NewNote() {
                         <option value="Study">Study</option>
                     </select>
 
-                    {/* Submit button */}
-                    {/* زر إرسال النموذج لحفظ النوتة */}
                     <button
                         type="submit"
-                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold shadow-md hover:opacity-90 transition"
+                        className="w-full bg-pink-600 hover:bg-pink-700 text-white py-3 rounded-lg font-semibold shadow-md transition"
                     >
-                        Save Note
-                        {/* حفظ النوتة */}
+                        Add Note
                     </button>
                 </form>
             </div>
+
+            {/* Animated gradient background CSS */}
+            <style>
+                {`
+                @keyframes gradientMove {
+                    0% { background-position: 0% 50%; }
+                    50% { background-position: 100% 50%; }
+                    100% { background-position: 0% 50%; }
+                }
+                `}
+            </style>
         </div>
     );
 }
 
-// Export component to be used in routes
-// تصدير الكومبوننت لاستخدامه في التطبيق
 export default NewNote;
