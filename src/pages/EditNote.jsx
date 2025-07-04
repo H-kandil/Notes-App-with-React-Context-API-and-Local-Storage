@@ -59,7 +59,6 @@ function EditNote() {
     }
 
     return (
-        // Main container with animated gradient background
         <div
             className="min-h-screen p-8 flex items-center justify-center"
             style={{
