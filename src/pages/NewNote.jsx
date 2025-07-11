@@ -3,38 +3,29 @@ import { useNavigate } from "react-router-dom";
 import { useNotes } from "../context/NotesContext";
 
 function NewNote() {
-    // Hook for navigation
     const navigate = useNavigate();
-
-    // Access addNote function from context
     const { addNote } = useNotes();
 
-    // Local state for form inputs
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
     const [category, setCategory] = useState("");
 
-    // Handle form submission
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validate form fields
         if (!title || !content || !category) {
             alert("Please fill all fields");
             return;
         }
 
-        // Create new note object
         const newNote = {
-            id: Date.now(),
             title,
             content,
             category,
-            date: new Date().toLocaleString(),
         };
 
-        addNote(newNote); // Add note to context
-        navigate("/"); // Redirect to homepage
+        await addNote(newNote);
+        navigate("/");
     };
 
     return (
@@ -47,7 +38,6 @@ function NewNote() {
                 animation: "gradientMove 15s ease infinite",
             }}
         >
-            {/* Note creation form container */}
             <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-xl">
                 <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
                     Add New Note
@@ -90,7 +80,6 @@ function NewNote() {
                 </form>
             </div>
 
-            {/* Animated gradient background CSS */}
             <style>
                 {`
                 @keyframes gradientMove {

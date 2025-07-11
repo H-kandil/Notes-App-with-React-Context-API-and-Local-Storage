@@ -1,59 +1,45 @@
-// Import necessary React functions and context
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useNotes } from "../context/NotesContext";
 
 function EditNote() {
-    // Get note ID from the URL parameters
-    const { id } = useParams();
-
-    // Hook for navigation
+    const { id } = useParams(); // MongoDB ID
     const navigate = useNavigate();
-
-    // Access notes and updateNote function from context
     const { notes, updateNote } = useNotes();
 
-    // Find the note to edit based on ID
-    const noteToEdit = notes.find((note) => note.id === Number(id));
-
-    // Local state for form inputs
+    const [noteToEdit, setNoteToEdit] = useState(null);
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
     const [category, setCategory] = useState("");
 
-    // Set the current values in form fields when component mounts
     useEffect(() => {
-        if (noteToEdit) {
-            setTitle(noteToEdit.title);
-            setContent(noteToEdit.content);
-            setCategory(noteToEdit.category);
+        const found = notes.find((note) => note._id === id);
+        if (found) {
+            setNoteToEdit(found);
+            setTitle(found.title);
+            setContent(found.content);
+            setCategory(found.category);
         }
-    }, [noteToEdit]);
+    }, [notes, id]);
 
-    // Handle form submission
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validate fields
         if (!title || !content || !category) {
             alert("Please fill all fields");
             return;
         }
 
-        // Create updated note object
-        const updatedNote = {
-            ...noteToEdit,
+        const updated = {
             title,
             content,
             category,
-            date: new Date().toLocaleString(),
         };
 
-        updateNote(updatedNote);
+        await updateNote(id, updated);
         navigate("/");
     };
 
-    // If note not found, show error message
     if (!noteToEdit) {
         return <p className="text-center mt-10 text-white">Note not found</p>;
     }
@@ -68,14 +54,12 @@ function EditNote() {
                 animation: "gradientMove 15s ease infinite",
             }}
         >
-            {/* Note edit form container */}
             <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-xl">
                 <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
                     Edit Note
                 </h2>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    {/* Title input */}
                     <input
                         type="text"
                         className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
@@ -83,7 +67,6 @@ function EditNote() {
                         onChange={(e) => setTitle(e.target.value)}
                     />
 
-                    {/* Content textarea */}
                     <textarea
                         className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
                         rows={5}
@@ -91,7 +74,6 @@ function EditNote() {
                         onChange={(e) => setContent(e.target.value)}
                     />
 
-                    {/* Category select */}
                     <select
                         className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
                         value={category}
@@ -103,7 +85,6 @@ function EditNote() {
                         <option value="Study">Study</option>
                     </select>
 
-                    {/* Update button */}
                     <button
                         type="submit"
                         className="w-full bg-pink-600 hover:bg-pink-700 text-white py-3 rounded-lg font-semibold shadow-md transition"
@@ -113,7 +94,6 @@ function EditNote() {
                 </form>
             </div>
 
-            {/* Animated gradient background CSS */}
             <style>
                 {`
                 @keyframes gradientMove {

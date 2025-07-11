@@ -22,13 +22,13 @@ function Register() {
         const { name, email, password } = form;
 
         if (!name || !email || !password) {
-            setError("يرجى ملء جميع الحقول.");
+            setError("Please fill in all fields.");
             return;
         }
 
         try {
             const res = await fetch(
-                "http://localhost:5000/api/users/register",
+                "https://note-app-backend-4.onrender.com/api/users/register",
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -39,13 +39,13 @@ function Register() {
             const data = await res.json();
 
             if (!res.ok) {
-                setError(data.message || "حدث خطأ أثناء التسجيل");
+                setError(data.message || "Registration failed");
             } else {
                 localStorage.setItem("token", data.token);
                 navigate("/");
             }
         } catch (err) {
-            setError("فشل الاتصال بالخادم");
+            setError("Failed to connect to the server.");
         }
     };
 
@@ -53,7 +53,7 @@ function Register() {
         <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
             <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
                 <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
-                    إنشاء حساب جديد
+                    Register
                 </h2>
 
                 {error && (
@@ -66,7 +66,7 @@ function Register() {
                     <input
                         type="text"
                         name="name"
-                        placeholder="الاسم الكامل"
+                        placeholder="Full Name"
                         value={form.name}
                         onChange={handleChange}
                         className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700"
@@ -74,7 +74,7 @@ function Register() {
                     <input
                         type="email"
                         name="email"
-                        placeholder="البريد الإلكتروني"
+                        placeholder="Email"
                         value={form.email}
                         onChange={handleChange}
                         className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700"
@@ -82,7 +82,7 @@ function Register() {
                     <input
                         type="password"
                         name="password"
-                        placeholder="كلمة المرور"
+                        placeholder="Password"
                         value={form.password}
                         onChange={handleChange}
                         className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-700"
@@ -92,7 +92,7 @@ function Register() {
                         type="submit"
                         className="w-full bg-gray-800 hover:bg-black text-white py-3 rounded-lg font-semibold transition"
                     >
-                        تسجيل
+                        Register
                     </button>
                 </form>
             </div>

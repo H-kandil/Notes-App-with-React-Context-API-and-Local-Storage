@@ -16,13 +16,16 @@ function Login() {
         }
 
         try {
-            const res = await fetch("http://localhost:5000/api/users/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ email, password }),
-            });
+            const res = await fetch(
+                "https://note-app-backend-4.onrender.com/api/users/login",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ email, password }),
+                }
+            );
 
             const data = await res.json();
 
@@ -31,7 +34,15 @@ function Login() {
             }
 
             localStorage.setItem("token", data.token);
-            localStorage.setItem("user", JSON.stringify({ id: data.id, name: data.name, email: data.email }));
+            localStorage.setItem(
+                "user",
+                JSON.stringify({
+                    id: data.id,
+                    name: data.name,
+                    email: data.email,
+                })
+            );
+
             navigate("/");
         } catch (err) {
             setError(err.message);
@@ -41,8 +52,12 @@ function Login() {
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
             <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
-                <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Login</h2>
-                {error && <p className="text-red-600 mb-4 text-center">{error}</p>}
+                <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
+                    Login
+                </h2>
+                {error && (
+                    <p className="text-red-600 mb-4 text-center">{error}</p>
+                )}
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <input
                         type="email"
@@ -66,3 +81,8 @@ function Login() {
                     </button>
                 </form>
             </div>
+        </div>
+    );
+}
+
+export default Login;
