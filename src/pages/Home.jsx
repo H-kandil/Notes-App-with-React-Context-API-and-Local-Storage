@@ -6,11 +6,41 @@ function Home() {
     const { notes, deleteNote } = useNotes();
 
     const [todoLists, setTodoLists] = useState([
-        { id: 1, tasks: [], input: "" },
-        { id: 2, tasks: [], input: "" },
-        { id: 3, tasks: [], input: "" },
-        { id: 4, tasks: [], input: "" },
-        { id: 5, tasks: [], input: "" },
+        {
+            id: 1,
+            title: "To-do List 1",
+            tasks: [],
+            input: "",
+            editingTitle: false,
+        },
+        {
+            id: 2,
+            title: "To-do List 2",
+            tasks: [],
+            input: "",
+            editingTitle: false,
+        },
+        {
+            id: 3,
+            title: "To-do List 3",
+            tasks: [],
+            input: "",
+            editingTitle: false,
+        },
+        {
+            id: 4,
+            title: "To-do List 4",
+            tasks: [],
+            input: "",
+            editingTitle: false,
+        },
+        {
+            id: 5,
+            title: "To-do List 5",
+            tasks: [],
+            input: "",
+            editingTitle: false,
+        },
     ]);
 
     const handleTaskChange = (listId, value) => {
@@ -23,19 +53,18 @@ function Home() {
 
     const handleTaskAdd = (listId) => {
         setTodoLists((prev) =>
-            prev.map((list) => {
-                if (list.id === listId && list.input.trim()) {
-                    return {
-                        ...list,
-                        tasks: [
-                            ...list.tasks,
-                            { text: list.input, editing: false, done: false },
-                        ],
-                        input: "",
-                    };
-                }
-                return list;
-            })
+            prev.map((list) =>
+                list.id === listId && list.input.trim()
+                    ? {
+                          ...list,
+                          tasks: [
+                              ...list.tasks,
+                              { text: list.input, editing: false, done: false },
+                          ],
+                          input: "",
+                      }
+                    : list
+            )
         );
     };
 
@@ -79,6 +108,56 @@ function Home() {
         );
     };
 
+    const handleTitleEdit = (listId, value) => {
+        setTodoLists((prev) =>
+            prev.map((list) =>
+                list.id === listId ? { ...list, title: value } : list
+            )
+        );
+    };
+
+    const toggleTitleEditing = (listId, editing) => {
+        setTodoLists((prev) =>
+            prev.map((list) =>
+                list.id === listId ? { ...list, editingTitle: editing } : list
+            )
+        );
+    };
+
+    const handleDeleteList = (listId) => {
+        setTodoLists((prev) => prev.filter((list) => list.id !== listId));
+    };
+
+    const handleDuplicateList = (listId) => {
+        setTodoLists((prev) => {
+            const original = prev.find((list) => list.id === listId);
+            if (!original) return prev;
+            const newId = Math.max(...prev.map((l) => l.id)) + 1;
+            const duplicate = {
+                ...original,
+                id: newId,
+                title: original.title + " (Copy)",
+                editingTitle: false,
+            };
+            return [...prev, duplicate];
+        });
+    };
+
+    const moveList = (listId, direction) => {
+        setTodoLists((prev) => {
+            const index = prev.findIndex((list) => list.id === listId);
+            if (index < 0) return prev;
+
+            const newIndex = direction === "up" ? index - 1 : index + 1;
+            if (newIndex < 0 || newIndex >= prev.length) return prev;
+
+            const newOrder = [...prev];
+            const [moved] = newOrder.splice(index, 1);
+            newOrder.splice(newIndex, 0, moved);
+            return newOrder;
+        });
+    };
+
     const handleDelete = (id) => {
         if (confirm("Are you sure you want to delete this note?")) {
             deleteNote(id);
@@ -97,20 +176,71 @@ function Home() {
         >
             {/* To-Do Lists Section */}
             <div className="flex flex-wrap gap-6 justify-center">
-                {todoLists.map((list) => (
+                {todoLists.map((list, idx) => (
                     <div
                         key={list.id}
                         className="bg-white rounded-2xl shadow-lg p-4 w-72 flex flex-col"
                     >
-                        <h2 className="text-lg font-bold text-gray-800 mb-2">
-                            To-do List {list.id}
-                        </h2>
+                        {/* Title & Actions */}
+                        <div className="flex items-center justify-between mb-2">
+                            {list.editingTitle ? (
+                                <input
+                                    type="text"
+                                    value={list.title}
+                                    onChange={(e) =>
+                                        handleTitleEdit(list.id, e.target.value)
+                                    }
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter")
+                                            toggleTitleEditing(list.id, false);
+                                    }}
+                                    className="text-sm border px-2 py-1 rounded w-full"
+                                    autoFocus
+                                />
+                            ) : (
+                                <h2
+                                    onClick={() =>
+                                        toggleTitleEditing(list.id, true)
+                                    }
+                                    className="text-lg font-bold text-gray-800 cursor-pointer"
+                                >
+                                    {list.title}
+                                </h2>
+                            )}
+                        </div>
+
+                        {/* Control Buttons */}
+                        <div className="flex justify-between mb-2 text-xs">
+                            <button
+                                onClick={() => moveList(list.id, "up")}
+                                className="text-gray-500 hover:text-black"
+                            >
+                                ↟ Up
+                            </button>
+                            <button
+                                onClick={() => moveList(list.id, "down")}
+                                className="text-gray-500 hover:text-black"
+                            >
+                                ↡ Down
+                            </button>
+                            <button
+                                onClick={() => handleDuplicateList(list.id)}
+                                className="text-gray-500 hover:text-black"
+                            >
+                                Copy
+                            </button>
+                            <button
+                                onClick={() => handleDeleteList(list.id)}
+                                className="text-red-500 hover:text-black"
+                            >
+                                Delete
+                            </button>
+                        </div>
+
+                        {/* Tasks */}
                         <div
                             className="overflow-y-auto border rounded px-2 py-2 space-y-2"
-                            style={{
-                                maxHeight: "280px",
-                                minHeight: "280px",
-                            }}
+                            style={{ maxHeight: "280px", minHeight: "280px" }}
                         >
                             {list.tasks.map((task, i) => (
                                 <div
@@ -161,6 +291,7 @@ function Home() {
                                 </div>
                             ))}
                         </div>
+
                         <input
                             type="text"
                             value={list.input}
