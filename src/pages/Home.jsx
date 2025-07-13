@@ -1,9 +1,19 @@
 import { useNotes } from "../context/NotesContext";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
     const { notes, deleteNote } = useNotes();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            navigate("/login");
+        }
+    }, [navigate]);
 
     const [todoLists, setTodoLists] = useState([
         {

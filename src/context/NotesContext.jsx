@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect, useReducer } from "react";
+import {
+    createContext,
+    useContext,
+    useEffect,
+    useReducer,
+    useState,
+} from "react";
 
 const NotesContext = createContext();
 
@@ -21,12 +27,13 @@ const notesReducer = (state, action) => {
 
 export const NotesProvider = ({ children }) => {
     const [notes, dispatch] = useReducer(notesReducer, []);
+    const [token, setToken] = useState(localStorage.getItem("token"));
 
-    // Get token from localStorage
-    const token = localStorage.getItem("token");
-
+    // Fetch notes if token exists
     useEffect(() => {
         const fetchNotes = async () => {
+            if (!token) return;
+
             try {
                 const res = await fetch(
                     "https://note-app-backend-4.onrender.com/api/notes",
@@ -37,19 +44,29 @@ export const NotesProvider = ({ children }) => {
                     }
                 );
 
-                if (!res.ok) throw new Error("Failed to fetch notes");
+                if (!res.ok) {
+                    console.error("Failed to fetch notes:", res.status);
+                    return;
+                }
 
                 const data = await res.json();
-                dispatch({ type: "SET_NOTES", payload: data });
+
+                if (Array.isArray(data)) {
+                    dispatch({ type: "SET_NOTES", payload: data });
+                } else {
+                    console.error("Invalid notes format received");
+                }
             } catch (err) {
                 console.error("Error fetching notes:", err.message);
             }
         };
 
-        if (token) fetchNotes();
+        fetchNotes();
     }, [token]);
 
     const addNote = async (note) => {
+        if (!token) return;
+
         try {
             const res = await fetch(
                 "https://note-app-backend-4.onrender.com/api/notes",
@@ -66,6 +83,8 @@ export const NotesProvider = ({ children }) => {
             const data = await res.json();
             if (res.ok) {
                 dispatch({ type: "ADD_NOTE", payload: data });
+            } else {
+                console.error("Error adding note:", data.message);
             }
         } catch (err) {
             console.error("Error adding note:", err.message);
@@ -73,6 +92,8 @@ export const NotesProvider = ({ children }) => {
     };
 
     const updateNote = async (updatedNote) => {
+        if (!token) return;
+
         try {
             const res = await fetch(
                 `https://note-app-backend-4.onrender.com/api/notes/${updatedNote._id}`,
@@ -89,6 +110,8 @@ export const NotesProvider = ({ children }) => {
             const data = await res.json();
             if (res.ok) {
                 dispatch({ type: "UPDATE_NOTE", payload: data });
+            } else {
+                console.error("Error updating note:", data.message);
             }
         } catch (err) {
             console.error("Error updating note:", err.message);
@@ -96,6 +119,8 @@ export const NotesProvider = ({ children }) => {
     };
 
     const deleteNote = async (id) => {
+        if (!token) return;
+
         try {
             const res = await fetch(
                 `https://note-app-backend-4.onrender.com/api/notes/${id}`,
@@ -109,6 +134,8 @@ export const NotesProvider = ({ children }) => {
 
             if (res.ok) {
                 dispatch({ type: "DELETE_NOTE", payload: id });
+            } else {
+                console.error("Error deleting note:", res.statusText);
             }
         } catch (err) {
             console.error("Error deleting note:", err.message);
@@ -117,7 +144,7 @@ export const NotesProvider = ({ children }) => {
 
     return (
         <NotesContext.Provider
-            value={{ notes, addNote, deleteNote, updateNote }}
+            value={{ notes, addNote, deleteNote, updateNote, token }}
         >
             {children}
         </NotesContext.Provider>
