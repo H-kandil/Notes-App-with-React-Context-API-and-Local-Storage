@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { FaApple, FaFacebookF, FaGoogle } from "react-icons/fa";
 
 function Login() {
     const navigate = useNavigate();
@@ -9,7 +10,6 @@ function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         if (!email || !password) {
             setError("Please fill in all fields");
             return;
@@ -50,92 +50,66 @@ function Login() {
     };
 
     return (
-        <div
-            className="min-h-screen flex items-center justify-center px-4"
-            style={{
-                backgroundImage:
-                    "linear-gradient(135deg, rgb(255,25,77), rgb(112,42,140), rgb(255,115,38), rgb(255,204,13))",
-                backgroundSize: "400% 400%",
-                animation: "gradientMove 15s ease infinite",
-            }}
-        >
-            <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
-                <h2 className="text-4xl font-bold text-center text-gray-900 mb-6">
-                    Welcome Back
+        <div className="flex items-center justify-center min-h-screen bg-black text-white px-4">
+            <div className="bg-gray-900 p-8 md:p-10 rounded-2xl shadow-2xl w-full max-w-md">
+                <h2 className="text-3xl font-bold text-center mb-6">
+                    Welcome Back 🌸{" "}
                 </h2>
+
                 {error && (
-                    <p className="text-red-600 mb-4 text-center">{error}</p>
+                    <p className="text-red-400 mb-4 text-center">{error}</p>
                 )}
+
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <input
                         type="email"
                         placeholder="Email"
-                        className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                        className="w-full bg-gray-800 text-white border border-gray-700 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7632e7]"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                     />
                     <input
                         type="password"
                         placeholder="Password"
-                        className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                        className="w-full bg-gray-800 text-white border border-gray-700 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7632e7]"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
                     <button
                         type="submit"
-                        className="w-full bg-black hover:bg-gray-800 text-white py-3 rounded-lg font-semibold shadow-md transition"
+                        className="w-full bg-[#7632e7] hover:bg-[#5c23c2] text-white py-3 rounded-lg font-semibold shadow-md transition"
                     >
                         Login
                     </button>
                 </form>
 
-                <div className="mt-6 text-center text-sm text-gray-600">
+                <div className="mt-6 text-center text-sm text-gray-400">
                     Don't have an account?{" "}
                     <Link
                         to="/register"
-                        className="text-pink-600 font-semibold hover:underline"
+                        className="text-[#7632e7] font-semibold hover:underline"
                     >
                         Sign up
                     </Link>
                 </div>
 
-                <div className="mt-6 flex items-center justify-center gap-4">
-                    <button className="flex items-center gap-2 border px-4 py-2 rounded-lg hover:bg-gray-100 transition text-sm">
-                        <img
-                            src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg"
-                            alt="Apple"
-                            className="w-4 h-4"
-                        />
-                        Apple
+                <div className="mt-6 text-center text-sm text-gray-500">OR</div>
+
+                <div className="mt-4 space-y-3">
+                    <button className="flex items-center justify-center w-full border border-gray-700 px-4 py-2 rounded-lg hover:bg-gray-800 transition text-sm font-medium gap-2">
+                        <FaApple className="text-white text-sm" />
+                        <span>Continue with Apple</span>
                     </button>
-                    <button className="flex items-center gap-2 border px-4 py-2 rounded-lg hover:bg-gray-100 transition text-sm">
-                        <img
-                            src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"
-                            alt="Google"
-                            className="w-4 h-4"
-                        />
-                        Google
+                    <button className="flex items-center justify-center w-full border border-gray-700 px-4 py-2 rounded-lg hover:bg-gray-800 transition text-sm font-medium gap-2">
+                        <FaGoogle className="text-white text-sm" />
+                        <span>Continue with Google</span>
                     </button>
-                    <button className="flex items-center gap-2 border px-4 py-2 rounded-lg hover:bg-gray-100 transition text-sm">
-                        <img
-                            src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg"
-                            alt="Facebook"
-                            className="w-4 h-4"
-                        />
-                        Facebook
+                    <button className="flex items-center justify-center w-full border border-gray-700 px-4 py-2 rounded-lg hover:bg-gray-800 transition text-sm font-medium gap-2">
+                        <FaFacebookF className="text-white text-sm" />
+                        <span>Continue with Facebook</span>
                     </button>
                 </div>
             </div>
-
-            <style>
-                {`
-                    @keyframes gradientMove {
-                        0% { background-position: 0% 50%; }
-                        50% { background-position: 100% 50%; }
-                        100% { background-position: 0% 50%; }
-                    }
-                `}
-            </style>
         </div>
     );
 }
