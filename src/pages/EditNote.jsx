@@ -3,26 +3,26 @@ import { useState, useEffect } from "react";
 import { useNotes } from "../context/NotesContext";
 
 function EditNote() {
-    const { id } = useParams(); // MongoDB ID
+    const { id } = useParams();
     const navigate = useNavigate();
     const { notes, updateNote } = useNotes();
 
-    const [noteToEdit, setNoteToEdit] = useState(null);
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
     const [category, setCategory] = useState("");
 
     useEffect(() => {
-        const found = notes.find((note) => note._id === id);
+        const found = notes.find((note) => String(note.id) === id);
         if (found) {
-            setNoteToEdit(found);
             setTitle(found.title);
             setContent(found.content);
             setCategory(found.category);
+        } else {
+            console.warn("Note not found");
         }
-    }, [notes, id]);
+    }, [id, notes]);
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
 
         if (!title || !content || !category) {
@@ -31,18 +31,15 @@ function EditNote() {
         }
 
         const updated = {
+            id: id,
             title,
             content,
             category,
         };
 
-        await updateNote(id, updated);
+        updateNote(updated);
         navigate("/");
     };
-
-    if (!noteToEdit) {
-        return <p className="text-center mt-10 text-white">Note not found</p>;
-    }
 
     return (
         <div
@@ -62,12 +59,14 @@ function EditNote() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <input
                         type="text"
+                        placeholder="Title"
                         className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                     />
 
                     <textarea
+                        placeholder="Content"
                         className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
                         rows={5}
                         value={content}

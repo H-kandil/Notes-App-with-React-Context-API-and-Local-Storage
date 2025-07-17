@@ -1,10 +1,4 @@
-import {
-    createContext,
-    useContext,
-    useEffect,
-    useReducer,
-    useState,
-} from "react";
+import { createContext, useContext, useEffect, useReducer } from "react";
 
 const NotesContext = createContext();
 
@@ -15,10 +9,10 @@ const notesReducer = (state, action) => {
         case "ADD_NOTE":
             return [...state, action.payload];
         case "DELETE_NOTE":
-            return state.filter((note) => note._id !== action.payload);
+            return state.filter((note) => note.id !== action.payload);
         case "UPDATE_NOTE":
             return state.map((note) =>
-                note._id === action.payload._id ? action.payload : note
+                note.id === action.payload.id ? action.payload : note
             );
         default:
             return state;
@@ -26,125 +20,44 @@ const notesReducer = (state, action) => {
 };
 
 export const NotesProvider = ({ children }) => {
-    const [notes, dispatch] = useReducer(notesReducer, []);
-    const [token, setToken] = useState(localStorage.getItem("token"));
+    const [notes, dispatch] = useReducer(notesReducer, [], () => {
+        const localData = localStorage.getItem("notes");
+        return localData ? JSON.parse(localData) : [];
+    });
 
-    // Fetch notes if token exists
+    // Sync to localStorage
     useEffect(() => {
-        const fetchNotes = async () => {
-            if (!token) return;
+        localStorage.setItem("notes", JSON.stringify(notes));
+    }, [notes]);
 
-            try {
-                const res = await fetch(
-                    "https://note-app-backend-4.onrender.com/api/notes",
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                );
-
-                if (!res.ok) {
-                    console.error("Failed to fetch notes:", res.status);
-                    return;
-                }
-
-                const data = await res.json();
-
-                if (Array.isArray(data)) {
-                    dispatch({ type: "SET_NOTES", payload: data });
-                } else {
-                    console.error("Invalid notes format received");
-                }
-            } catch (err) {
-                console.error("Error fetching notes:", err.message);
-            }
+    const addNote = (note) => {
+        const newNote = {
+            ...note,
+            id: Date.now().toString(),
+            date: new Date().toLocaleDateString(),
         };
-
-        fetchNotes();
-    }, [token]);
-
-    const addNote = async (note) => {
-        if (!token) return;
-
-        try {
-            const res = await fetch(
-                "https://note-app-backend-4.onrender.com/api/notes",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify(note),
-                }
-            );
-
-            const data = await res.json();
-            if (res.ok) {
-                dispatch({ type: "ADD_NOTE", payload: data });
-            } else {
-                console.error("Error adding note:", data.message);
-            }
-        } catch (err) {
-            console.error("Error adding note:", err.message);
-        }
+        dispatch({ type: "ADD_NOTE", payload: newNote });
     };
 
-    const updateNote = async (updatedNote) => {
-        if (!token) return;
-
-        try {
-            const res = await fetch(
-                `https://note-app-backend-4.onrender.com/api/notes/${updatedNote._id}`,
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify(updatedNote),
-                }
-            );
-
-            const data = await res.json();
-            if (res.ok) {
-                dispatch({ type: "UPDATE_NOTE", payload: data });
-            } else {
-                console.error("Error updating note:", data.message);
-            }
-        } catch (err) {
-            console.error("Error updating note:", err.message);
-        }
+    const updateNote = (updatedNote) => {
+        dispatch({
+            type: "UPDATE_NOTE",
+            payload: {
+                ...updatedNote,
+                date:
+                    notes.find((note) => note.id === updatedNote.id)?.date ||
+                    new Date().toLocaleDateString(),
+            },
+        });
     };
 
-    const deleteNote = async (id) => {
-        if (!token) return;
-
-        try {
-            const res = await fetch(
-                `https://note-app-backend-4.onrender.com/api/notes/${id}`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-
-            if (res.ok) {
-                dispatch({ type: "DELETE_NOTE", payload: id });
-            } else {
-                console.error("Error deleting note:", res.statusText);
-            }
-        } catch (err) {
-            console.error("Error deleting note:", err.message);
-        }
+    const deleteNote = (id) => {
+        dispatch({ type: "DELETE_NOTE", payload: id });
     };
 
     return (
         <NotesContext.Provider
-            value={{ notes, addNote, deleteNote, updateNote, token }}
+            value={{ notes, addNote, deleteNote, updateNote }}
         >
             {children}
         </NotesContext.Provider>

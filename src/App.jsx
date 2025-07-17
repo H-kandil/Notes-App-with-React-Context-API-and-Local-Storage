@@ -1,20 +1,21 @@
+import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
-import NewNote from "./pages/NewNote";
 import EditNote from "./pages/EditNote";
-import Login from "./pages/Login"; 
-import Register from "./pages/Register";
-
+import NewNote from "./pages/NewNote";
+import { NotesProvider } from "./context/NotesContext";
 
 function App() {
     return (
-        <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/new" element={<NewNote />} />
-            <Route path="/edit/:id" element={<EditNote />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-        </Routes>
+        <NotesProvider>
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/new" element={<NewNote />} />
+                <Route path="/edit/:id" element={<EditNote />} />
+                {/* Fallback route */}
+                <Route path="*" element={<Home />} />
+            </Routes>
+        </NotesProvider>
     );
 }
 

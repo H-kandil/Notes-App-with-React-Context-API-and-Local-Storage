@@ -10,7 +10,7 @@ function NewNote() {
     const [content, setContent] = useState("");
     const [category, setCategory] = useState("");
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
 
         if (!title || !content || !category) {
@@ -22,9 +22,10 @@ function NewNote() {
             title,
             content,
             category,
+            date: new Date().toLocaleDateString(), // optional
         };
 
-        await addNote(newNote);
+        addNote(newNote);
         navigate("/");
     };
 
@@ -42,26 +43,23 @@ function NewNote() {
                 <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
                     Add New Note
                 </h2>
-
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <input
                         type="text"
                         placeholder="Title"
-                        className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+                        className="w-full border border-gray-300 p-3 rounded-lg"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                     />
-
                     <textarea
                         placeholder="Content"
-                        className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+                        className="w-full border border-gray-300 p-3 rounded-lg"
                         rows={5}
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
                     />
-
                     <select
-                        className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+                        className="w-full border border-gray-300 p-3 rounded-lg"
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
                     >
@@ -70,25 +68,21 @@ function NewNote() {
                         <option value="Personal">Personal</option>
                         <option value="Study">Study</option>
                     </select>
-
                     <button
                         type="submit"
-                        className="w-full bg-pink-600 hover:bg-pink-700 text-white py-3 rounded-lg font-semibold shadow-md transition"
+                        className="w-full bg-pink-600 hover:bg-pink-700 text-white py-3 rounded-lg"
                     >
                         Add Note
                     </button>
                 </form>
             </div>
-
-            <style>
-                {`
+            <style>{`
                 @keyframes gradientMove {
                     0% { background-position: 0% 50%; }
                     50% { background-position: 100% 50%; }
                     100% { background-position: 0% 50%; }
                 }
-                `}
-            </style>
+            `}</style>
         </div>
     );
 }

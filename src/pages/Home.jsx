@@ -1,57 +1,68 @@
 import { useNotes } from "../context/NotesContext";
 import { Link } from "react-router-dom";
-import { useState } from "react";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 function Home() {
     const { notes, deleteNote } = useNotes();
-    const navigate = useNavigate();
+
+    const [todoLists, setTodoLists] = useState(() => {
+        try {
+            const saved = JSON.parse(localStorage.getItem("todoLists"));
+            return Array.isArray(saved)
+                ? saved
+                : Array.from({ length: 5 }, (_, i) => ({
+                      id: i + 1,
+                      title: `To-do List ${i + 1}`,
+                      tasks: [],
+                      input: "",
+                      editingTitle: false,
+                  }));
+        } catch (error) {
+            return [];
+        }
+    });
+
+    const [timer, setTimer] = useState(1500); // 25 minutes
+    const [isRunning, setIsRunning] = useState(false);
+    const [isBreak, setIsBreak] = useState(false);
+    const [workDuration, setWorkDuration] = useState(1500);
+    const [breakDuration, setBreakDuration] = useState(300);
+    const [volume, setVolume] = useState(0.5);
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            navigate("/login");
-        }
-    }, [navigate]);
+        const savedLists = JSON.stringify(todoLists);
+        localStorage.setItem("todoLists", savedLists);
+    }, [todoLists]);
 
-    const [todoLists, setTodoLists] = useState([
-        {
-            id: 1,
-            title: "To-do List 1",
-            tasks: [],
-            input: "",
-            editingTitle: false,
-        },
-        {
-            id: 2,
-            title: "To-do List 2",
-            tasks: [],
-            input: "",
-            editingTitle: false,
-        },
-        {
-            id: 3,
-            title: "To-do List 3",
-            tasks: [],
-            input: "",
-            editingTitle: false,
-        },
-        {
-            id: 4,
-            title: "To-do List 4",
-            tasks: [],
-            input: "",
-            editingTitle: false,
-        },
-        {
-            id: 5,
-            title: "To-do List 5",
-            tasks: [],
-            input: "",
-            editingTitle: false,
-        },
-    ]);
+    useEffect(() => {
+        let interval;
+        if (isRunning) {
+            interval = setInterval(() => {
+                setTimer((prev) => {
+                    if (prev === 1) {
+                        new Audio(
+                            "https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg"
+                        ).play();
+                        setIsRunning(false);
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+        }
+        return () => clearInterval(interval);
+    }, [isRunning]);
+
+    const handleStart = () => setIsRunning(true);
+    const handlePause = () => setIsRunning(false);
+    const handleReset = () => {
+        setIsRunning(false);
+        setTimer(isBreak ? breakDuration : workDuration);
+    };
+    const toggleMode = () => {
+        setIsBreak((prev) => !prev);
+        setTimer(!isBreak ? breakDuration : workDuration);
+    };
 
     const handleTaskChange = (listId, value) => {
         setTodoLists((prev) =>
@@ -184,14 +195,12 @@ function Home() {
                 animation: "gradientMove 15s ease infinite",
             }}
         >
-            {/* To-Do Lists Section */}
             <div className="flex flex-wrap gap-6 justify-center">
-                {todoLists.map((list, idx) => (
+                {todoLists.map((list) => (
                     <div
                         key={list.id}
                         className="bg-white rounded-2xl shadow-lg p-4 w-72 flex flex-col"
                     >
-                        {/* Title & Actions */}
                         <div className="flex items-center justify-between mb-2">
                             {list.editingTitle ? (
                                 <input
@@ -200,10 +209,10 @@ function Home() {
                                     onChange={(e) =>
                                         handleTitleEdit(list.id, e.target.value)
                                     }
-                                    onKeyDown={(e) => {
-                                        if (e.key === "Enter")
-                                            toggleTitleEditing(list.id, false);
-                                    }}
+                                    onKeyDown={(e) =>
+                                        e.key === "Enter" &&
+                                        toggleTitleEditing(list.id, false)
+                                    }
                                     className="text-sm border px-2 py-1 rounded w-full"
                                     autoFocus
                                 />
@@ -219,7 +228,6 @@ function Home() {
                             )}
                         </div>
 
-                        {/* Control Buttons */}
                         <div className="flex justify-between mb-2 text-xs">
                             <button
                                 onClick={() => moveList(list.id, "up")}
@@ -247,7 +255,6 @@ function Home() {
                             </button>
                         </div>
 
-                        {/* Tasks */}
                         <div
                             className="overflow-y-auto border rounded px-2 py-2 space-y-2"
                             style={{ maxHeight: "280px", minHeight: "280px" }}
@@ -273,15 +280,10 @@ function Home() {
                                                     e.target.value
                                                 )
                                             }
-                                            onKeyDown={(e) => {
-                                                if (e.key === "Enter") {
-                                                    toggleEditing(
-                                                        list.id,
-                                                        i,
-                                                        false
-                                                    );
-                                                }
-                                            }}
+                                            onKeyDown={(e) =>
+                                                e.key === "Enter" &&
+                                                toggleEditing(list.id, i, false)
+                                            }
                                             autoFocus
                                         />
                                     ) : (
@@ -308,9 +310,9 @@ function Home() {
                             onChange={(e) =>
                                 handleTaskChange(list.id, e.target.value)
                             }
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter") handleTaskAdd(list.id);
-                            }}
+                            onKeyDown={(e) =>
+                                e.key === "Enter" && handleTaskAdd(list.id)
+                            }
                             className="mt-2 border border-gray-300 rounded px-3 py-2 text-sm w-full"
                             placeholder="Add new task"
                         />
@@ -324,7 +326,6 @@ function Home() {
                 ))}
             </div>
 
-            {/* Notes Section */}
             <div className="rounded-2xl shadow-2xl w-full max-w-6xl mx-auto">
                 <div className="flex justify-between items-center mb-8">
                     <h1 className="text-4xl font-bold text-white">My Notes</h1>
@@ -344,7 +345,7 @@ function Home() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {notes.map((note) => (
                             <div
-                                key={note._id || note.id}
+                                key={note.id}
                                 className="bg-white border border-gray-200 rounded-2xl shadow-xl p-6 flex flex-col justify-between"
                             >
                                 <div>
@@ -363,15 +364,13 @@ function Home() {
                                 </div>
                                 <div className="flex justify-end gap-2">
                                     <Link
-                                        to={`/edit/${note._id || note.id}`}
+                                        to={`/edit/${note.id}`}
                                         className="bg-orange-300 hover:bg-pink-700 text-white px-2 py-1 rounded-lg font-semibold shadow-md transition"
                                     >
                                         Edit
                                     </Link>
                                     <button
-                                        onClick={() =>
-                                            handleDelete(note._id || note.id)
-                                        }
+                                        onClick={() => handleDelete(note.id)}
                                         className="bg-pink-600 hover:bg-pink-700 text-white px-2 py-1 rounded-lg font-semibold shadow-md transition"
                                     >
                                         Delete
@@ -383,21 +382,98 @@ function Home() {
                 )}
             </div>
 
-            {/* Pomodoro Placeholder Section */}
-            <div className="mt-20 text-white text-center">
-                <h2 className="text-3xl font-bold mb-2">Pomodoro Timer</h2>
-                <p className="text-white">Coming soon...</p>
+            <div
+                className="mt-10 text-black text-center bg-white bg-opacity-40 py-5 rounded-2xl w-100"
+                flex
+                justify-center
+                items-center
+                min-h-screen
+            >
+                <h2 className="text-3xl font-bold mb-4">Pomodoro Timer</h2>
+                <div className="text-6xl font-mono mb-4">
+                    {Math.floor(timer / 60)
+                        .toString()
+                        .padStart(2, "0")}
+                    :{(timer % 60).toString().padStart(2, "0")}
+                </div>
+                <div className="flex justify-center gap-4 mb-4">
+                    <button
+                        onClick={handleStart}
+                        className="bg-green-600 hover:bg-green-700 text-black px-4 py-2 rounded"
+                    >
+                        Start
+                    </button>
+                    <button
+                        onClick={handlePause}
+                        className="bg-yellow-500 hover:bg-yellow-600 text-black px-4 py-2 rounded"
+                    >
+                        Pause
+                    </button>
+                    <button
+                        onClick={handleReset}
+                        className="bg-red-600 hover:bg-red-700 text-black px-4 py-2 rounded"
+                    >
+                        Reset
+                    </button>
+                    <button
+                        onClick={toggleMode}
+                        className="bg-blue-600 hover:bg-blue-700 text-black px-4 py-2 rounded"
+                    >
+                        {isBreak ? "Back to Work" : "Take Break"}
+                    </button>
+                </div>
+                <div className="flex justify-center gap-1">
+                    <div>
+                        <label className="block text-black text-sm">
+                            Work (minutes)
+                        </label>
+                        <input
+                            type="number"
+                            value={workDuration / 60}
+                            onChange={(e) =>
+                                setWorkDuration(+e.target.value * 60)
+                            }
+                            className="rounded text-black px-2 py-1"
+                            min={1}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-black text-sm">
+                            Break (minutes)
+                        </label>
+                        <input
+                            type="number"
+                            value={breakDuration / 60}
+                            onChange={(e) =>
+                                setBreakDuration(+e.target.value * 60)
+                            }
+                            className="rounded text-black px-2 py-1"
+                            min={1}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-black text-sm">
+                            Volume
+                        </label>
+                        <input
+                            type="range"
+                            min="0"
+                            max="1"
+                            step="0.1"
+                            value={volume}
+                            onChange={(e) => setVolume(+e.target.value)}
+                        />
+                    </div>
+                </div>
             </div>
 
-            <style>
-                {`
+            <style>{`
                 @keyframes gradientMove {
                     0% { background-position: 0% 50%; }
                     50% { background-position: 100% 50%; }
                     100% { background-position: 0% 50%; }
                 }
-                `}
-            </style>
+            `}</style>
         </div>
     );
 }
